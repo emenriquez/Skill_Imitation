@@ -9,11 +9,7 @@ public class SkillAnimationScript : MonoBehaviour
 {
     [Header("Body Parts")] [Space(10)]
     public Transform hips;
-    public ConfigurableJoint chest;
-    public ConfigurableJoint head;
-    public ConfigurableJoint upperArmR, upperArmL, foreArmR, foreArmL;
-    public ConfigurableJoint thighR, thighL, shinR, shinL, footR, footL;
-
+    public Transform core, neck, lShoulder, rShoulder, lElbow, rElbow, rHip, lHip, rKnee, lKnee, rAnkle, lAnkle;
 
     List<string> skillList = new List<string> 
     {
@@ -35,41 +31,44 @@ public class SkillAnimationScript : MonoBehaviour
     };
 
     [Header("Player Controls")] [Space(10)]
-    public int skillSelect;
     public Text skillText;
+
 
     [HideInInspector] public Motion skill = new Motion();
     void Start()
     {
-        string json = File.ReadAllText($"Assets/Motions/{skillList[skillSelect]}.json");
-
-        skill = JsonUtility.FromJson<Motion>(json);
-
-        skillText.text = skillList[skillSelect];
-
         StartCoroutine(waiter());
     }
 
     IEnumerator waiter() {
-        while (true)
-        {
-        foreach (Frame frame in skill.Frames) {
-            this.transform.localPosition = frame.rootPosition;
-            this.transform.localRotation = frame.rootRotation;
-            chest.targetRotation = frame.chestRotation;
-            head.targetRotation = frame.neckRotation;
-            thighR.targetRotation = frame.rHipRotation;
-            shinR.targetRotation = Quaternion.Euler(frame.rKneeRotation);
-            footR.targetRotation = frame.rAnkleRotation;
-            upperArmR.targetRotation = frame.rShoulderRotation;
-            foreArmR.targetRotation = Quaternion.Euler(frame.rElbowRotation);
-            thighL.targetRotation = frame.lHipRotation;
-            shinL.targetRotation = Quaternion.Euler(frame.lKneeRotation);
-            footL.targetRotation = frame.lAnkleRotation;
-            upperArmL.targetRotation = frame.lShoulderRotation;
-            foreArmL.targetRotation = Quaternion.Euler(frame.lElbowRotation);
-            yield return new WaitForSeconds(frame.deltaTime);
+        foreach (string skillName in skillList) {
+            string json = File.ReadAllText($"Assets/Motions/{skillName}.json");
+            skill = JsonUtility.FromJson<Motion>(json);
+            skillText.text = skillName;
+
+            int i = 0;
+            while (i < 2)
+            {
+                foreach (Frame frame in skill.Frames) {
+                    hips.localPosition = frame.rootPosition;
+                    hips.localRotation = frame.rootRotation;
+                    core.localRotation = frame.chestRotation;
+                    neck.localRotation = frame.neckRotation;
+                    rHip.localRotation = frame.rHipRotation;
+                    rKnee.localRotation = Quaternion.Euler(frame.rKneeRotation);
+                    rAnkle.localRotation = frame.rAnkleRotation;
+                    rShoulder.localRotation = frame.rShoulderRotation;
+                    rElbow.localRotation = Quaternion.Euler(frame.rElbowRotation);
+                    lHip.localRotation = frame.lHipRotation;
+                    lKnee.localRotation = Quaternion.Euler(frame.lKneeRotation);
+                    lAnkle.localRotation = frame.lAnkleRotation;
+                    lShoulder.localRotation = frame.lShoulderRotation;
+                    lElbow.localRotation = Quaternion.Euler(frame.lElbowRotation);
+                    yield return new WaitForSeconds(frame.deltaTime);
+                    }
+                i++;
             }
+
         }
     }
 }
